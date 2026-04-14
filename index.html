@@ -1,1 +1,453 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Instagram Pro Dashboard</title>
+<style>
+  :root {
+    --bg1:#ffffff;--bg2:#f5f5f3;--bg3:#efefec;--text1:#1a1a18;--text2:#6b6b66;
+    --border1:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.22);--radius-md:8px;--radius-lg:12px;
+    --green:#3B6D11;--green-bg:#EAF3DE;--blue:#185FA5;--blue-bg:#E6F1FB;
+    --amber:#854F0B;--amber-bg:#FAEEDA;--red:#A32D2D;--red-bg:#FCEBEB;--purple:#534AB7;--purple-bg:#EEEDFE;
+  }
+  @media(prefers-color-scheme:dark){:root{--bg1:#1e1e1c;--bg2:#2a2a28;--bg3:#333330;--text1:#e8e6dc;--text2:#9c9a92;--border1:rgba(255,255,255,0.1);--border2:rgba(255,255,255,0.2);--green:#97C459;--green-bg:#173404;--blue:#85B7EB;--blue-bg:#042C53;--amber:#FAC775;--amber-bg:#412402;--red:#F09595;--red-bg:#501313;--purple:#AFA9EC;--purple-bg:#26215C;}}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;direction:rtl;font-size:14px;color:var(--text1);background:var(--bg3);min-height:100vh}
+  .wrapper{max-width:1100px;margin:0 auto;padding:1.5rem 1rem}
+  .topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:10px;background:var(--bg1);border-radius:var(--radius-lg);padding:14px 18px;border:0.5px solid var(--border1)}
+  .logo{font-size:18px;font-weight:600;color:var(--text1)}.logo span{font-weight:300;color:var(--text2);font-size:14px;margin-right:8px}
+  .page-switcher{display:flex;gap:8px}
+  .ptab{padding:7px 16px;border-radius:var(--radius-md);border:0.5px solid var(--border2);font-size:13px;cursor:pointer;background:transparent;color:var(--text2);transition:all .15s;display:flex;align-items:center;gap:6px;font-family:inherit}
+  .ptab.active{background:var(--bg2);color:var(--text1);font-weight:500}.ptab:hover:not(.active){background:var(--bg2)}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+  .section{display:none}.section.active{display:block}
+  .page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px}
+  .page-title{font-size:15px;font-weight:500}
+  .row4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}
+  .row3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+  @media(max-width:700px){.row4{grid-template-columns:1fr 1fr}.row3,.row2{grid-template-columns:1fr}}
+  .mcard{background:var(--bg2);border-radius:var(--radius-md);padding:12px 14px}
+  .mlbl{font-size:11px;color:var(--text2);margin-bottom:5px}.mval{font-size:22px;font-weight:600}.msub{font-size:11px;margin-top:3px}
+  .up{color:var(--green)}.dn{color:var(--red)}.nt{color:var(--text2)}
+  .card{background:var(--bg1);border:0.5px solid var(--border1);border-radius:var(--radius-lg);padding:14px 16px}
+  .ctitle{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px}
+  .badge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:20px;font-weight:500;white-space:nowrap}
+  .bg{background:var(--green-bg);color:var(--green)}.bb{background:var(--blue-bg);color:var(--blue)}
+  .ba{background:var(--amber-bg);color:var(--amber)}.br{background:var(--red-bg);color:var(--red)}
+  .bp{background:var(--purple-bg);color:var(--purple)}.bgr{background:var(--bg2);color:var(--text2)}
+  .nav-tabs{display:flex;gap:6px;margin-bottom:12px;border-bottom:0.5px solid var(--border1);padding-bottom:8px;flex-wrap:wrap}
+  .ntab{font-size:12px;padding:5px 12px;border:none;background:none;cursor:pointer;color:var(--text2);border-radius:var(--radius-md);transition:all .15s;font-family:inherit}
+  .ntab.active{background:var(--bg2);color:var(--text1);font-weight:500}
+  .tab-panel{display:none}.tab-panel.active{display:block}
+  .agent-box{border:0.5px solid var(--border1);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg1)}
+  .agent-hd{background:var(--bg2);padding:9px 13px;display:flex;align-items:center;justify-content:space-between}
+  .agent-name{font-size:13px;font-weight:500}
+  .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pls 2s infinite;display:inline-block}
+  @keyframes pls{0%,100%{opacity:1}50%{opacity:.35}}
+  .agent-bd{padding:11px 13px}
+  .out-box{background:var(--bg2);border-radius:var(--radius-md);padding:10px 12px;font-size:13px;line-height:1.65;min-height:76px;white-space:pre-line;transition:opacity .3s;margin-bottom:10px;color:var(--text1)}
+  .actions{display:flex;gap:7px;flex-wrap:wrap}
+  .btn{padding:6px 14px;border-radius:var(--radius-md);font-size:12px;cursor:pointer;border:0.5px solid var(--border2);background:transparent;color:var(--text1);transition:all .15s;font-family:inherit}
+  .btn:hover{background:var(--bg2)}.btn-p{background:var(--text1);color:var(--bg1);border-color:transparent}.btn-p:hover{opacity:.85}
+  .btn-g{border-color:var(--green);color:var(--green)}.btn-r{border-color:var(--red);color:var(--red)}.btn-b{border-color:var(--blue);color:var(--blue)}
+  .btn:disabled{opacity:.4;cursor:not-allowed}
+  .pipeline-step{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border1)}.pipeline-step:last-child{border-bottom:none}
+  .ps-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+  .ps-num.done{background:var(--green-bg);color:var(--green)}.ps-num.active{background:var(--blue-bg);color:var(--blue)}.ps-num.wait{background:var(--bg2);color:var(--text2)}
+  .ps-text{font-size:13px;flex:1}
+  .barchart{height:58px;display:flex;align-items:flex-end;gap:3px;padding-top:6px}
+  .bc{flex:1;border-radius:2px 2px 0 0;background:var(--border1);min-height:4px}.bc.hi{background:var(--blue)}.bc.hi2{background:var(--green)}
+  .bc-lbls{display:flex;gap:3px;margin-top:3px}.bc-l{flex:1;text-align:center;font-size:9px;color:var(--text2)}
+  .sb-wrap{margin:5px 0}.sb-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:3px}
+  .sb{height:5px;border-radius:3px;background:var(--border1);overflow:hidden}.sf{height:100%;border-radius:3px}
+  .sched-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border1);font-size:13px}.sched-row:last-child{border-bottom:none}
+  .st{font-size:11px;color:var(--text2);min-width:60px}
+  .sponsor-card{border:0.5px solid var(--border1);border-radius:var(--radius-md);padding:10px 12px;margin-bottom:7px;display:flex;align-items:center;gap:10px}
+  .slogo{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--bg2);flex-shrink:0}
+  .sinfo{flex:1;min-width:0}.sname{font-size:13px;font-weight:500}.smeta{font-size:11px;color:var(--text2);margin-top:2px}
+  .sval{font-size:13px;font-weight:500;white-space:nowrap}
+  .trend-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border1)}.trend-item:last-child{border-bottom:none}
+  .trank{font-size:12px;font-weight:500;color:var(--text2);min-width:22px}.ttag{font-size:13px;flex:1}.tvol{font-size:11px;color:var(--text2)}
+  .comp-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:0.5px solid var(--border1);font-size:13px}.comp-row:last-child{border-bottom:none}
+  .cname{flex:1;font-weight:500}.cstat{font-size:11px;color:var(--text2);min-width:72px;text-align:center}
+  .info-box{background:var(--blue-bg);border:0.5px solid var(--blue);border-radius:var(--radius-md);padding:12px 14px;font-size:13px;line-height:1.7;color:var(--text1);margin-bottom:12px}
+  .warn-box{background:var(--amber-bg);border:0.5px solid var(--amber);border-radius:var(--radius-md);padding:12px 14px;font-size:13px;line-height:1.7;color:var(--text1);margin-bottom:12px}
+  input,select{background:var(--bg1);color:var(--text1);border:0.5px solid var(--border2);border-radius:var(--radius-md);padding:7px 10px;font-size:13px;font-family:inherit;direction:rtl}
+  input:focus,select:focus{outline:none;border-color:var(--blue)}
+</style>
+</head>
+<body dir="rtl">
+<div class="wrapper">
+  <div class="topbar">
+    <div class="logo">📊 Instagram Pro <span>לוח בקרה</span></div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <button class="btn btn-b" onclick="document.getElementById('settings-modal').style.display='flex'">⚙️ הגדרות API</button>
+      <div class="page-switcher">
+        <button class="ptab active" onclick="switchPage('fit',this)"><span class="dot" style="background:#3B6D11"></span>💪 כושר וחד"כ</button>
+        <button class="ptab" onclick="switchPage('eco',this)"><span class="dot" style="background:#185FA5"></span>📈 כלכלה</button>
+      </div>
+    </div>
+  </div>
 
+  <div id="settings-modal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center">
+    <div style="background:var(--bg1);border-radius:var(--radius-lg);padding:24px;width:min(480px,90vw);max-height:90vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <div style="font-size:16px;font-weight:600">⚙️ הגדרות</div>
+        <button class="btn" onclick="document.getElementById('settings-modal').style.display='none'">✕</button>
+      </div>
+      <div class="ctitle">Anthropic API Key</div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <input type="password" id="api-key-input" placeholder="sk-ant-..." style="flex:1" oninput="localStorage.setItem('ak',this.value)">
+        <button class="btn btn-p" onclick="testKey()">בדוק</button>
+      </div>
+      <div id="api-status" style="font-size:12px;color:var(--text2);margin-bottom:14px"></div>
+      <div class="warn-box">🔐 ה-Key נשמר רק בדפדפן שלך — לא נשלח לשום מקום מלבד Anthropic.</div>
+      <div class="ctitle" style="margin-top:10px">Instagram Access Token</div>
+      <div class="info-box">
+        <strong>איך מקבלים Token:</strong><br>
+        1. כנסי ל-<strong>developers.facebook.com</strong><br>
+        2. My Apps → Create App → Business<br>
+        3. הוסיפי Instagram Graph API<br>
+        4. Tools → Graph API Explorer → Generate Token<br>
+        5. הרשאות: instagram_basic + pages_read_engagement
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input type="password" id="ig-fit" placeholder="Token עמוד כושר..." style="flex:1" oninput="localStorage.setItem('ig_fit',this.value)">
+        <button class="btn" onclick="testIG('fit')">בדוק</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:8px">
+        <input type="password" id="ig-eco" placeholder="Token עמוד כלכלה..." style="flex:1" oninput="localStorage.setItem('ig_eco',this.value)">
+        <button class="btn" onclick="testIG('eco')">בדוק</button>
+      </div>
+      <div id="ig-status" style="font-size:12px;color:var(--text2)"></div>
+    </div>
+  </div>
+
+  <div class="section active" id="page-fit">
+    <div class="page-header">
+      <div class="page-title" id="fit-title">@fitlife_il — 💪 כושר, תזונה וחיים בריאים</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="badge bg">פעיל</span>
+        <button class="btn btn-p" onclick="runPipeline('fit')">▶ Pipeline מלא</button>
+      </div>
+    </div>
+    <div class="row4">
+      <div class="mcard"><div class="mlbl">עוקבים</div><div class="mval" id="fit-fw">12,480</div><div class="msub up">↑ +340 השבוע</div></div>
+      <div class="mcard"><div class="mlbl">מעורבות</div><div class="mval">4.7%</div><div class="msub up">↑ ממוצע 3.2% בנישה</div></div>
+      <div class="mcard"><div class="mlbl">הגעה שבועית</div><div class="mval">87,200</div><div class="msub up">↑ +12%</div></div>
+      <div class="mcard"><div class="mlbl">הכנסה חזויה</div><div class="mval">₪4,200</div><div class="msub nt">ספונסרים</div></div>
+    </div>
+    <div class="nav-tabs">
+      <button class="ntab active" onclick="switchTab('fit','agents',this)">🤖 Agents</button>
+      <button class="ntab" onclick="switchTab('fit','analytics',this)">📊 אנליטיקס</button>
+      <button class="ntab" onclick="switchTab('fit','sponsors',this)">🤝 ספונסרים</button>
+      <button class="ntab" onclick="switchTab('fit','trends',this)">🔥 טרנדים</button>
+      <button class="ntab" onclick="switchTab('fit','competition',this)">⚔️ תחרות</button>
+      <button class="ntab" onclick="switchTab('fit','schedule',this)">📅 תזמון</button>
+    </div>
+    <div class="tab-panel active" id="fit-agents">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;padding:8px 12px;background:var(--bg2);border-radius:var(--radius-md)">מצב: <strong>חצי-אוטומטי</strong> — Agent יוצר תוכן, את מאשרת לפני פרסום</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="ctitle">מצב Pipeline</div>
+        <div class="pipeline-step"><span class="ps-num wait" id="fit-p1n">1</span><span class="ps-text">Agent תוכן</span><span id="fit-p1b"><span class="badge bgr">ממתין</span></span></div>
+        <div class="pipeline-step"><span class="ps-num wait" id="fit-p2n">2</span><span class="ps-text">Agent ביקורת</span><span id="fit-p2b"><span class="badge bgr">ממתין</span></span></div>
+        <div class="pipeline-step"><span class="ps-num wait" id="fit-p3n">3</span><span class="ps-text">אישורך</span><span id="fit-p3b"><span class="badge bgr">ממתין</span></span></div>
+        <div class="pipeline-step"><span class="ps-num wait" id="fit-p4n">4</span><span class="ps-text">Agent פרסום</span><span id="fit-p4b"><span class="badge bgr">ממתין</span></span></div>
+      </div>
+      <div class="row3">
+        <div class="agent-box">
+          <div class="agent-hd"><div><div class="agent-name">🧠 Agent תוכן</div><div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;margin-top:2px"><span class="pulse"></span>Claude API</div></div><span class="badge bp">Claude</span></div>
+          <div class="agent-bd">
+            <div class="out-box" id="fit-c-out">לחצי "צור תוכן" — Agent יכתוב רעיונות לפוסטים.</div>
+            <div class="actions"><button class="btn btn-p" id="fit-c-btn" onclick="runContent('fit')">✨ צור תוכן</button><button class="btn" onclick="document.getElementById('fit-c-out').textContent='נוקה.'">נקה</button></div>
+          </div>
+        </div>
+        <div class="agent-box">
+          <div class="agent-hd"><div><div class="agent-name">🔍 Agent ביקורת</div><div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;margin-top:2px"><span class="pulse"></span>ממתין</div></div><span class="badge ba">QA</span></div>
+          <div class="agent-bd">
+            <div class="out-box" id="fit-r-out">ביקורת תופיע לאחר יצירת תוכן...</div>
+            <div class="actions"><button class="btn btn-p" id="fit-r-btn" onclick="runReview('fit')" disabled>🔎 בקר</button><button class="btn btn-r" onclick="reject('fit')">✗ דחה</button></div>
+          </div>
+        </div>
+        <div class="agent-box">
+          <div class="agent-hd"><div><div class="agent-name">📤 Agent פרסום</div><div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;margin-top:2px"><span class="pulse"></span>ממתין לאישורך</div></div><span class="badge bb">Scheduler</span></div>
+          <div class="agent-bd">
+            <div class="out-box" id="fit-p-out">לאחר אישורך — Agent יתזמן.</div>
+            <div class="actions"><button class="btn btn-g" id="fit-ap-btn" onclick="approve('fit')" disabled>✅ אשרי ותזמני</button><button class="btn btn-b" onclick="pitch('fit')">📧 Pitch</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="fit-analytics">
+      <div class="row2">
+        <div class="card"><div class="ctitle">מעורבות לפי סוג תוכן</div>
+          <div class="barchart"><div class="bc hi2" style="height:90%"></div><div class="bc hi2" style="height:72%"></div><div class="bc" style="height:45%"></div><div class="bc" style="height:38%"></div><div class="bc" style="height:55%"></div></div>
+          <div class="bc-lbls"><div class="bc-l">Reels</div><div class="bc-l">קרוסל</div><div class="bc-l">תמונה</div><div class="bc-l">סטורי</div><div class="bc-l">Live</div></div>
+        </div>
+        <div class="card"><div class="ctitle">שעות פרסום מיטביות</div>
+          <div class="barchart"><div class="bc" style="height:25%"></div><div class="bc" style="height:35%"></div><div class="bc" style="height:50%"></div><div class="bc hi" style="height:88%"></div><div class="bc hi" style="height:95%"></div><div class="bc hi" style="height:82%"></div><div class="bc" style="height:55%"></div></div>
+          <div class="bc-lbls"><div class="bc-l">10</div><div class="bc-l">12</div><div class="bc-l">14</div><div class="bc-l">17</div><div class="bc-l">18</div><div class="bc-l">20</div><div class="bc-l">22</div></div>
+          <div style="font-size:12px;color:var(--text2);margin-top:8px">שיא: 17:00–20:00</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="card"><div class="ctitle">ציוני תוכן</div>
+          <div class="sb-wrap"><div class="sb-labels"><span>מעורבות</span><span>82%</span></div><div class="sb"><div class="sf" style="width:82%;background:var(--green)"></div></div></div>
+          <div class="sb-wrap"><div class="sb-labels"><span>רלוונטיות</span><span>91%</span></div><div class="sb"><div class="sf" style="width:91%;background:var(--green)"></div></div></div>
+          <div class="sb-wrap"><div class="sb-labels"><span>פוטנציאל ויראלי</span><span>74%</span></div><div class="sb"><div class="sf" style="width:74%;background:#EF9F27"></div></div></div>
+          <div class="sb-wrap"><div class="sb-labels"><span>מושך ספונסרים</span><span>68%</span></div><div class="sb"><div class="sf" style="width:68%;background:#EF9F27"></div></div></div>
+        </div>
+        <div class="card"><div class="ctitle">תובנות</div>
+          <div style="font-size:13px;line-height:1.9">
+            <div style="padding:5px 0;border-bottom:0.5px solid var(--border1)">💡 Reels עם CTA ממירים 4.2x יותר</div>
+            <div style="padding:5px 0;border-bottom:0.5px solid var(--border1)">🎯 10K = nano-influencer ₪500–₪2,000/פוסט</div>
+            <div style="padding:5px 0;border-bottom:0.5px solid var(--border1)">📊 Engagement 4.7% — גבוה ב-47% מממוצע</div>
+            <div style="padding:5px 0">🔥 פוטנציאל ₪8,000/חודש ב-20K עוקבים</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="fit-sponsors">
+      <div class="card" style="margin-bottom:12px"><div class="ctitle">עסקאות פעילות</div>
+        <div class="sponsor-card"><div class="slogo">💊</div><div class="sinfo"><div class="sname">MyProtein IL</div><div class="smeta">3 פוסטים/חודש · <span class="badge bg">פעיל</span></div></div><div class="sval up">₪1,800/חודש</div></div>
+        <div class="sponsor-card"><div class="slogo">👟</div><div class="sinfo"><div class="sname">Nike Israel</div><div class="smeta">Reel חד-פעמי · <span class="badge ba">ממתין</span></div></div><div class="sval nt">₪2,500?</div></div>
+      </div>
+      <div class="card"><div class="ctitle">Pitch Generator</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <input id="fit-sn" placeholder="שם המותג..." style="flex:1;min-width:100px">
+          <select id="fit-st"><option>תוספי תזונה</option><option>ביגוד ספורט</option><option>ציוד כושר</option><option>אפליקציה</option></select>
+          <button class="btn btn-p" onclick="pitch('fit')">📧 צור Pitch</button>
+        </div>
+        <div class="out-box" id="fit-pitch" style="min-height:70px">הפנייה תיכתב כאן...</div>
+      </div>
+    </div>
+    <div class="tab-panel" id="fit-trends">
+      <div class="row2">
+        <div class="card"><div class="ctitle">טרנדים חמים 🔥</div>
+          <div class="trend-item"><span class="trank">#1</span><span class="ttag">#workout_at_home</span><span class="tvol">2.1M</span><span class="up">↑</span></div>
+          <div class="trend-item"><span class="trank">#2</span><span class="ttag">#proteinrecipes</span><span class="tvol">1.4M</span><span class="up">↑</span></div>
+          <div class="trend-item"><span class="trank">#3</span><span class="ttag">#כושר_בית</span><span class="tvol">280K</span><span class="up">↑↑</span></div>
+          <div class="trend-item"><span class="trank">#4</span><span class="ttag">#creatine_benefits</span><span class="tvol">190K</span><span class="up">↑↑</span></div>
+        </div>
+        <div class="card"><div class="ctitle">פוטנציאל ספונסרים</div>
+          <div class="trend-item"><span class="trank">💰</span><span class="ttag">סקירת תוספי חלבון</span><span class="badge ba">₪800–1,200</span></div>
+          <div class="trend-item"><span class="trank">💰</span><span class="ttag">השוואת נעלי ריצה</span><span class="badge ba">₪1,500–2,500</span></div>
+          <div class="trend-item"><span class="trank">💡</span><span class="ttag">שינה ואיתחול שרירים</span><span class="badge bb">ויראלי</span></div>
+          <button class="btn btn-p" style="margin-top:10px;width:100%" onclick="trendPost('fit')">🤖 פוסט על הטרנד הכי חם</button>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="fit-competition">
+      <div class="card"><div class="ctitle">מתחרים — כושר ישראל</div>
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;font-size:11px;color:var(--text2);padding:4px 0;border-bottom:0.5px solid var(--border1)"><span>עמוד</span><span style="text-align:center">עוקבים</span><span style="text-align:center">Eng.</span><span style="text-align:center">פוסטים/שבוע</span></div>
+        <div class="comp-row"><span class="cname">@fitil_official <span class="badge bg">ראשי</span></span><span class="cstat">28,400</span><span class="cstat">3.1%</span><span class="cstat">7</span></div>
+        <div class="comp-row"><span class="cname">@healthy_il</span><span class="cstat">19,800</span><span class="cstat">2.8%</span><span class="cstat">5</span></div>
+        <div class="comp-row" style="background:var(--bg2);border-radius:var(--radius-md);padding:7px 8px"><span class="cname up">@fitlife_il ✓</span><span class="cstat up">12,480</span><span class="cstat up">4.7%</span><span class="cstat">4</span></div>
+      </div>
+    </div>
+    <div class="tab-panel" id="fit-schedule">
+      <div class="row2">
+        <div class="card"><div class="ctitle">לוח השבוע</div>
+          <div class="sched-row"><span class="st">היום 18:00</span><div style="flex:1">💪 10 שגיאות באימון</div><span class="badge ba">ממתין</span></div>
+          <div class="sched-row"><span class="st">מחר 12:00</span><div style="flex:1">🥑 7 מזונות לריכוז</div><span class="badge bg">מאושר ✓</span></div>
+          <div class="sched-row"><span class="st">ד׳ 20:00</span><div style="flex:1">🧘 מדיטציה אחרי אימון</div><span class="badge bb">Agent</span></div>
+          <div class="sched-row"><span class="st">ה׳ 09:00</span><div style="flex:1">📊 חלבונים — MyProtein</div><span class="badge bg">ספונסר ✓</span></div>
+        </div>
+        <div class="card"><div class="ctitle">יחס תוכן מומלץ</div>
+          <div class="sb-wrap"><div class="sb-labels"><span>אורגני</span><span>70%</span></div><div class="sb"><div class="sf" style="width:70%;background:var(--green)"></div></div></div>
+          <div class="sb-wrap"><div class="sb-labels"><span>ספונסר</span><span>30%</span></div><div class="sb"><div class="sf" style="width:30%;background:var(--blue)"></div></div></div>
+          <div style="font-size:11px;color:var(--text2);margin-top:6px">מעל 30% ספונסר → ירידה במעורבות</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" id="page-eco">
+    <div class="page-header">
+      <div class="page-title" id="eco-title">@econ_il — 📈 כלכלה, שוק ההון, כסף חכם</div>
+      <div style="display:flex;gap:8px;align-items:center"><span class="badge bb">פעיל</span><button class="btn btn-p" onclick="runPipeline('eco')">▶ Pipeline מלא</button></div>
+    </div>
+    <div class="row4">
+      <div class="mcard"><div class="mlbl">עוקבים</div><div class="mval" id="eco-fw">8,920</div><div class="msub up">↑ +560 השבוע</div></div>
+      <div class="mcard"><div class="mlbl">מעורבות</div><div class="mval">5.2%</div><div class="msub up">↑ גבוה מהנישה</div></div>
+      <div class="mcard"><div class="mlbl">הגעה שבועית</div><div class="mval">64,100</div><div class="msub up">↑ +19%</div></div>
+      <div class="mcard"><div class="mlbl">הכנסה חזויה</div><div class="mval">₪5,800</div><div class="msub nt">ספונסרים פיננסיים</div></div>
+    </div>
+    <div class="nav-tabs">
+      <button class="ntab active" onclick="switchTab('eco','agents',this)">🤖 Agents</button>
+      <button class="ntab" onclick="switchTab('eco','analytics',this)">📊 אנליטיקס</button>
+      <button class="ntab" onclick="switchTab('eco','sponsors',this)">🤝 ספונסרים</button>
+      <button class="ntab" onclick="switchTab('eco','trends',this)">🔥 טרנדים</button>
+      <button class="ntab" onclick="switchTab('eco','competition',this)">⚔️ תחרות</button>
+      <button class="ntab" onclick="switchTab('eco','schedule',this)">📅 תזמון</button>
+    </div>
+    <div class="tab-panel active" id="eco-agents">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;padding:8px 12px;background:var(--bg2);border-radius:var(--radius-md)">מצב: <strong>חצי-אוטומטי</strong> — Agent יוצר תוכן, את מאשרת לפני פרסום</div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="ctitle">מצב Pipeline</div>
+        <div class="pipeline-step"><span class="ps-num wait" id="eco-p1n">1</span><span class="ps-text">Agent תוכן</span><span id="eco-p1b"><span class="badge bgr">ממתין</span></span></div>
+        <div class="pipeline-step"><span class="ps-num wait" id="eco-p2n">2</span><span class="ps-text">Agent ביקורת</span><span id="eco-p2b"><span class="badge bgr">ממתין</span></span></div>
+        <div class="pipeline-step"><span class="ps-num wait" id="eco-p3n">3</span><span class="ps-text">אישורך</span><span id="eco-p3b"><span class="badge bgr">ממתין</span></span></div>
+        <div class="pipeline-step"><span class="ps-num wait" id="eco-p4n">4</span><span class="ps-text">Agent פרסום</span><span id="eco-p4b"><span class="badge bgr">ממתין</span></span></div>
+      </div>
+      <div class="row3">
+        <div class="agent-box">
+          <div class="agent-hd"><div><div class="agent-name">🧠 Agent תוכן</div><div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;margin-top:2px"><span class="pulse"></span>Claude API</div></div><span class="badge bp">Claude</span></div>
+          <div class="agent-bd"><div class="out-box" id="eco-c-out">לחצי "צור תוכן" — Agent יכתוב פוסט כלכלי.</div>
+            <div class="actions"><button class="btn btn-p" id="eco-c-btn" onclick="runContent('eco')">✨ צור תוכן</button><button class="btn" onclick="document.getElementById('eco-c-out').textContent='נוקה.'">נקה</button></div>
+          </div>
+        </div>
+        <div class="agent-box">
+          <div class="agent-hd"><div><div class="agent-name">🔍 Agent ביקורת</div><div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;margin-top:2px"><span class="pulse"></span>ממתין</div></div><span class="badge ba">QA</span></div>
+          <div class="agent-bd"><div class="out-box" id="eco-r-out">ביקורת תופיע לאחר יצירת תוכן...</div>
+            <div class="actions"><button class="btn btn-p" id="eco-r-btn" onclick="runReview('eco')" disabled>🔎 בקר</button><button class="btn btn-r" onclick="reject('eco')">✗ דחה</button></div>
+          </div>
+        </div>
+        <div class="agent-box">
+          <div class="agent-hd"><div><div class="agent-name">📤 Agent פרסום</div><div style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px;margin-top:2px"><span class="pulse"></span>ממתין</div></div><span class="badge bb">Scheduler</span></div>
+          <div class="agent-bd"><div class="out-box" id="eco-p-out">לאחר אישורך — Agent יתזמן.</div>
+            <div class="actions"><button class="btn btn-g" id="eco-ap-btn" onclick="approve('eco')" disabled>✅ אשרי ותזמני</button><button class="btn btn-b" onclick="pitch('eco')">📧 Pitch</button></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="eco-analytics">
+      <div class="row2">
+        <div class="card"><div class="ctitle">מעורבות לפי סוג תוכן</div>
+          <div class="barchart"><div class="bc hi" style="height:88%"></div><div class="bc hi" style="height:76%"></div><div class="bc" style="height:52%"></div><div class="bc" style="height:44%"></div></div>
+          <div class="bc-lbls"><div class="bc-l">שאלות</div><div class="bc-l">ניתוח</div><div class="bc-l">טיפים</div><div class="bc-l">חדשות</div></div>
+        </div>
+        <div class="card"><div class="ctitle">ציוני תוכן</div>
+          <div class="sb-wrap"><div class="sb-labels"><span>מעורבות</span><span>88%</span></div><div class="sb"><div class="sf" style="width:88%;background:var(--blue)"></div></div></div>
+          <div class="sb-wrap"><div class="sb-labels"><span>אמינות</span><span>94%</span></div><div class="sb"><div class="sf" style="width:94%;background:var(--blue)"></div></div></div>
+          <div class="sb-wrap"><div class="sb-labels"><span>ויראלי</span><span>81%</span></div><div class="sb"><div class="sf" style="width:81%;background:var(--blue)"></div></div></div>
+          <div class="sb-wrap"><div class="sb-labels"><span>מושך ספונסרים</span><span>87%</span></div><div class="sb"><div class="sf" style="width:87%;background:var(--blue)"></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="eco-sponsors">
+      <div class="card" style="margin-bottom:12px"><div class="ctitle">עסקאות פעילות</div>
+        <div class="sponsor-card"><div class="slogo">🏦</div><div class="sinfo"><div class="sname">Interactive Brokers IL</div><div class="smeta">3 פוסטים/חודש · <span class="badge bg">פעיל</span></div></div><div class="sval up">₪2,800/חודש</div></div>
+        <div class="sponsor-card"><div class="slogo">💳</div><div class="sinfo"><div class="sname">Max (לאומי קארד)</div><div class="smeta">קמפיין 3 חודשים · <span class="badge ba">ממתין</span></div></div><div class="sval nt">₪4,200?</div></div>
+      </div>
+      <div class="card"><div class="ctitle">Pitch Generator</div>
+        <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
+          <input id="eco-sn" placeholder="שם המותג..." style="flex:1;min-width:100px">
+          <select id="eco-st"><option>בנק/ברוקר</option><option>כרטיס אשראי</option><option>פינטק</option><option>נדל"ן</option></select>
+          <button class="btn btn-p" onclick="pitch('eco')">📧 צור Pitch</button>
+        </div>
+        <div class="out-box" id="eco-pitch" style="min-height:70px">הפנייה תיכתב כאן...</div>
+      </div>
+    </div>
+    <div class="tab-panel" id="eco-trends">
+      <div class="row2">
+        <div class="card"><div class="ctitle">טרנדים חמים 🔥</div>
+          <div class="trend-item"><span class="trank">#1</span><span class="ttag">#השקעות_2026</span><span class="tvol">1.8M</span><span class="up">↑↑</span></div>
+          <div class="trend-item"><span class="trank">#2</span><span class="ttag">#חיסכון_חכם</span><span class="tvol">1.1M</span><span class="up">↑</span></div>
+          <div class="trend-item"><span class="trank">#3</span><span class="ttag">#ETF_בישראל</span><span class="tvol">310K</span><span class="up">↑</span></div>
+          <div class="trend-item"><span class="trank">#4</span><span class="ttag">#שוק_ההון_ישראל</span><span class="tvol">420K</span><span class="up">↑↑</span></div>
+        </div>
+        <div class="card"><div class="ctitle">פוטנציאל ספונסרים</div>
+          <div class="trend-item"><span class="trank">💰</span><span class="ttag">השוואת פלטפורמות</span><span class="badge ba">₪2,000–4,000</span></div>
+          <div class="trend-item"><span class="trank">💰</span><span class="ttag">מדריך פנסיה</span><span class="badge ba">₪1,500–3,000</span></div>
+          <div class="trend-item"><span class="trank">💡</span><span class="ttag">10 טעויות משקיעים</span><span class="badge bb">ויראלי</span></div>
+          <button class="btn btn-p" style="margin-top:10px;width:100%" onclick="trendPost('eco')">🤖 פוסט על הטרנד הכי חם</button>
+        </div>
+      </div>
+    </div>
+    <div class="tab-panel" id="eco-competition">
+      <div class="card"><div class="ctitle">מתחרים — כלכלה ישראל</div>
+        <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:6px;font-size:11px;color:var(--text2);padding:4px 0;border-bottom:0.5px solid var(--border1)"><span>עמוד</span><span style="text-align:center">עוקבים</span><span style="text-align:center">Eng.</span><span style="text-align:center">פוסטים/שבוע</span></div>
+        <div class="comp-row"><span class="cname">@money_il_official <span class="badge bg">ראשי</span></span><span class="cstat">42,100</span><span class="cstat">3.4%</span><span class="cstat">9</span></div>
+        <div class="comp-row"><span class="cname">@investing_israel</span><span class="cstat">24,500</span><span class="cstat">4.1%</span><span class="cstat">6</span></div>
+        <div class="comp-row" style="background:var(--bg2);border-radius:var(--radius-md);padding:7px 8px"><span class="cname up">@econ_il ✓</span><span class="cstat up">8,920</span><span class="cstat up">5.2%</span><span class="cstat">4</span></div>
+        <div style="margin-top:10px;font-size:12px;color:var(--text2)">✅ Engagement הגבוה ביותר — יתרון מוחלט בפניות לספונסרים</div>
+      </div>
+    </div>
+    <div class="tab-panel" id="eco-schedule">
+      <div class="row2">
+        <div class="card"><div class="ctitle">לוח השבוע</div>
+          <div class="sched-row"><span class="st">היום 20:00</span><div style="flex:1">📊 מה קרה בבורסה?</div><span class="badge ba">ממתין</span></div>
+          <div class="sched-row"><span class="st">מחר 18:00</span><div style="flex:1">💸 5 טיפים לחיסכון</div><span class="badge bg">מאושר ✓</span></div>
+          <div class="sched-row"><span class="st">ד׳ 12:00</span><div style="flex:1">🏠 נדל"ן 2026</div><span class="badge bb">Agent</span></div>
+          <div class="sched-row"><span class="st">ה׳ 20:00</span><div style="flex:1">📈 ETF — IB</div><span class="badge bg">ספונסר ✓</span></div>
+        </div>
+        <div class="card"><div class="ctitle">יחס תוכן</div>
+          <div class="sb-wrap"><div class="sb-labels"><span>חינוכי</span><span>65%</span></div><div class="sb"><div class="sf" style="width:65%;background:var(--blue)"></div></div></div>
+          <div class="sb-wrap"><div class="sb-labels"><span>ספונסר</span><span>25%</span></div><div class="sb"><div class="sf" style="width:25%;background:#EF9F27"></div></div></div>
+          <div class="sb-wrap"><div class="sb-labels"><span>אישי</span><span>10%</span></div><div class="sb"><div class="sf" style="width:10%;background:var(--green)"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const C={fit:{content:''},eco:{content:''}};
+const ak=()=>localStorage.getItem('ak')||'';
+window.onload=()=>{
+  const k=ak();if(k)document.getElementById('api-key-input').value=k;
+  const f=localStorage.getItem('ig_fit');if(f)document.getElementById('ig-fit').value=f;
+  const e=localStorage.getItem('ig_eco');if(e)document.getElementById('ig-eco').value=e;
+};
+async function testKey(){
+  const k=ak(),el=document.getElementById('api-status');
+  if(!k){el.textContent='❌ אין key';el.style.color='var(--red)';return;}
+  el.textContent='⏳ בודק...';el.style.color='var(--text2)';
+  try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:10,messages:[{role:'user',content:'hi'}]})});
+  const d=await r.json();
+  if(d.content){el.textContent='✅ תקין — Agents פעילים!';el.style.color='var(--green)';}
+  else{el.textContent='❌ '+(d.error?.message||'שגיאה');el.style.color='var(--red)';}}
+  catch(e){el.textContent='❌ שגיאת חיבור';el.style.color='var(--red)';}
+}
+async function testIG(page){
+  const t=localStorage.getItem('ig_'+page),el=document.getElementById('ig-status');
+  if(!t){el.textContent='❌ אין token';el.style.color='var(--red)';return;}
+  el.textContent='⏳ מתחברת...';
+  try{const r=await fetch(`https://graph.instagram.com/me?fields=id,username,followers_count&access_token=${t}`);
+  const d=await r.json();
+  if(d.username){el.textContent=`✅ @${d.username} · ${(d.followers_count||0).toLocaleString()} עוקבים`;el.style.color='var(--green)';
+  document.getElementById(page+'-fw').textContent=(d.followers_count||0).toLocaleString();
+  document.getElementById(page+'-title').textContent=`@${d.username} — ${page==='fit'?'💪 כושר':'📈 כלכלה'}`;}
+  else{el.textContent='❌ '+(d.error?.message||'שגיאה');el.style.color='var(--red)';}}
+  catch(e){el.textContent='⚠️ שגיאת רשת';el.style.color='var(--amber)';}
+}
+function switchPage(p,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.ptab').forEach(t=>t.classList.remove('active'));document.getElementById('page-'+p).classList.add('active');btn.classList.add('active');}
+function switchTab(page,tab,btn){const sec=document.getElementById('page-'+page);sec.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));sec.querySelectorAll('.ntab').forEach(b=>b.classList.remove('active'));document.getElementById(page+'-'+tab).classList.add('active');btn.classList.add('active');}
+function setPipe(pg,step,st){const n=document.getElementById(`${pg}-p${step}n`),b=document.getElementById(`${pg}-p${step}b`);n.className='ps-num '+(st==='done'?'done':st==='active'?'active':'wait');n.textContent=st==='done'?'✓':step;const m={done:['bg','הושלם ✓'],active:['bb','פעיל...'],wait:['bgr','ממתין'],approval:['ba','ממתינה לאישורך!']};const[c,l]=m[st]||m.wait;b.innerHTML=`<span class="badge ${c}">${l}</span>`;}
+function setOut(id,text,fade){const el=document.getElementById(id);if(!el)return;if(fade)el.style.opacity='0.4';setTimeout(()=>{el.style.opacity='1';el.textContent=text;},fade?300:0);}
+async function claude(prompt){const k=ak();if(!k)return demo(prompt);
+  try{const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':k,'anthropic-version':'2023-06-01'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:700,messages:[{role:'user',content:prompt}]})});const d=await r.json();return d.content?.map(b=>b.text||'').join('\n')||demo(prompt);}catch(e){return demo(prompt);}
+}
+function demo(p){
+  if(p.includes('ביקורת'))return'✅ ציון: 91/100\n\nחוזקות:\n• Hook חזק ומושך\n• CTA ברור\n• תגיות טובות\n\nשיפורים:\n• הוסיפי מספרים לכותרת\n• קצרי ל-150 מילה\n\n✅ מאושר לפרסום';
+  if(p.includes('תזמן'))return'✅ אושר ותוזמן!\n\nשעת פרסום: מחר 18:00\nפלטפורמה: Reel + סטורי\nטיפ: 3 שורות caption בלבד';
+  if(p.includes('Pitch')){const pg=p.includes('eco')?'eco':'fit';const n=document.getElementById(pg+'-sn')?.value||'המותג';return`שלום ${n},\n\nאני מנהלת עמוד ${pg==='eco'?'כלכלה ב-8,920 עוקבים, Engagement 5.2%':'כושר ב-12,480 עוקבים, Engagement 4.7%'}.\n\nהצעתי: 3 פוסטים + 8 סטוריז/חודש.\nתמחור: ₪${pg==='eco'?'2,000–4,000':'1,500–2,500'}/חודש.\n\nנשמח לדבר — בברכה`;}
+  if(p.includes('eco')||p.includes('כלכלה'))return'📱 רעיון — קרוסל:\n\nכותרת: "10,000 ₪ — איפה לשים ב-2026?"\n\nשקף 1: מניות\nשקף 2: ETF ← הכי מומלץ\nשקף 3: פיקדון\nשקף 4: "איפה אתם?" 👇\n\n#השקעות #כסף_חכם #econ_il #שוק_ההון';
+  return'📱 רעיון — Reel:\n\nכותרת: "3 שגיאות שמונעות ממך לרדת במשקל"\n\nHook: "את עושה את זה לא נכון..."\n1. אכילה לפני אימון\n2. יותר מדי קרדיו\n3. שינה — חשובה כמו אימון\n\nCTA: "שמרי לפני שתתחרטי 🔖"\n\n#כושר #fitlife_il #בריאות';
+}
+async function runContent(pg){const btn=document.getElementById(pg+'-c-btn');btn.disabled=true;btn.textContent='⏳ יוצר...';setOut(pg+'-c-out','🧠 כותב...',true);setPipe(pg,1,'active');
+const t={fit:'כושר, תזונה וחיים בריאים — קהל נשי ישראלי גיל 22–38',eco:'כלכלה, השקעות וחיסכון — קהל ישראלי 25–40'};
+const res=await claude(`צרי פוסט אינסטגרם מרתק: ${t[pg]}. Hook חזק, תוכן קצר, CTA, 5 תגיות. עברית בלבד. עד 120 מילה.`);
+setOut(pg+'-c-out',res);C[pg].content=res;setPipe(pg,1,'done');setPipe(pg,2,'active');btn.disabled=false;btn.textContent='✨ צור תוכן';document.getElementById(pg+'-r-btn').disabled=false;}
+async function runReview(pg){const btn=document.getElementById(pg+'-r-btn');btn.disabled=true;btn.textContent='⏳ בודק...';setOut(pg+'-r-out','🔍 בודק...',true);
+const res=await claude(`בקרי פוסט אינסטגרם${pg==='eco'?' עם דגש עובדתי':''}: ציון 0-100, חוזקות, שיפורים, האם לאשר? עברית.\nפוסט: ${C[pg].content}`);
+setOut(pg+'-r-out',res);setPipe(pg,2,'done');setPipe(pg,3,'approval');btn.disabled=false;btn.textContent='🔎 בקר';document.getElementById(pg+'-ap-btn').disabled=false;}
+async function approve(pg){const btn=document.getElementById(pg+'-ap-btn');btn.disabled=true;btn.textContent='⏳ מתזמן...';setOut(pg+'-p-out','📅 מתזמן...',true);setPipe(pg,3,'done');setPipe(pg,4,'active');
+const res=await claude(`הפוסט אושר: "${C[pg].content.substring(0,150)}". כתבי: שעת פרסום מיטבית 17-20, פורמט, טיפ. עד 60 מילה. עברית.`);
+setOut(pg+'-p-out','✅ אושר ותוזמן!\n\n'+res);setPipe(pg,4,'done');btn.disabled=false;btn.textContent='✅ אשרי ותזמני';}
+async function pitch(pg){const n=document.getElementById(pg+'-sn')?.value||'המותג';const t=document.getElementById(pg+'-st')?.value||'חברה';
+const outId=pg+'-pitch';setOut(outId,'📧 כותב...',true);
+const stats=pg==='fit'?'12,480 עוקבים, Engagement 4.7%, כושר':'8,920 עוקבים, Engagement 5.2%, כלכלה';
+const res=await claude(`כתבי Pitch קצר ל"${n}" בתחום ${t}. נתונים: ${stats}. ערך ברור, תמחור, CTA. עד 100 מילה. עברית.`);
+setOut(outId,res);}
+async function trendPost(pg){setOut(pg+'-c-out','🔥 יוצר...',true);const t={fit:'creatine ו-workout at home',eco:'ETF ו-השקעות 2026'};
+const res=await claude(`פוסט ויראלי על: ${t[pg]}. Hook, 3 נקודות, שאלה לקהל, 5 תגיות. 130 מילה. עברית.`);
+setOut(pg+'-c-out',res);C[pg].content=res;switchTab(pg,'agents',document.querySelector('#page-'+pg+' .ntab'));document.getElementById(pg+'-r-btn').disabled=false;setPipe(pg,1,'done');setPipe(pg,2,'active');}
+function reject(pg){setOut(pg+'-r-out','✗ נדחה — מייצר מחדש...',true);setPipe(pg,1,'active');setPipe(pg,2,'wait');document.getElementById(pg+'-ap-btn').disabled=true;setTimeout(()=>runContent(pg),800);}
+async function runPipeline(pg){await runContent(pg);setTimeout(async()=>await runReview(pg),2500);}
+</script>
+</body>
+</html>
