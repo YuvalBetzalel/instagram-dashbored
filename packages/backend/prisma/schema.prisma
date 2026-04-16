@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Media {
+  id        String   @id @default(cuid())
+  filename  String
+  mimetype  String
+  size      Int
+  path      String
+  tags      String   @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  scripts   Script[]
+}
+
+model Script {
+  id          String   @id @default(cuid())
+  content     String
+  contentType String   @default("Reel")
+  niche       String   @default("ספורטוויר נשים")
+  capcut      String?
+  hashtags    String?
+  mediaId     String?
+  media       Media?   @relation(fields: [mediaId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  posts       Post[]
+}
+
+model Post {
+  id          String    @id @default(cuid())
+  caption     String
+  scheduledAt DateTime
+  publishedAt DateTime?
+  status      String    @default("pending")
+  instagramId String?
+  scriptId    String?
+  script      Script?   @relation(fields: [scriptId], references: [id])
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Settings {
+  id                   String   @id @default("singleton")
+  instagramAccessToken String?
+  instagramPageId      String?
+  anthropicApiKey      String?
+  updatedAt            DateTime @updatedAt
+}
