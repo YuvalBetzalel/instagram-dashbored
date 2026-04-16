@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "concurrently -n backend,frontend -c cyan,magenta \"npm run dev --workspace=packages/backend\" \"npm run dev --workspace=packages/frontend\"",
     "build": "npm run build --workspace=packages/backend && npm run build --workspace=packages/frontend",
-    "setup": "npm install && npm run prisma:migrate --workspace=packages/backend"
+    "setup": "npm install && cp -n packages/backend/.env.example packages/backend/.env; npm run prisma:migrate --workspace=packages/backend"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
