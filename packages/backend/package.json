@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "nest start --watch",
-    "build": "nest build",
+    "build": "prisma generate && nest build",
+    "postinstall": "prisma generate",
     "start": "node dist/main",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init"
@@ -22,6 +23,7 @@
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.0",
+    "@nestjs/schematics": "^10.1.0",
     "@types/multer": "^1.4.11",
     "@types/node": "^20.11.0",
     "prisma": "^5.22.0",

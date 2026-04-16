@@ -1,0 +1,15 @@
+{
+  "name": "Instagram Dashboard",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "postCreateCommand": "npm install && cd packages/backend && npx prisma migrate deploy && cd ../..",
+  "forwardPorts": [3000, 5173],
+  "portsAttributes": {
+    "5173": { "label": "Frontend", "onAutoForward": "openBrowser" },
+    "3000": { "label": "Backend" }
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    }
+  }
+}
