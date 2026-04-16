@@ -4,13 +4,14 @@
   "scripts": {
     "dev": "nest start --watch",
     "build": "prisma generate && nest build",
-    "postinstall": "prisma generate",
+    "postinstall": "node -e \"const fs=require('fs');if(!fs.existsSync('.env'))fs.copyFileSync('.env.example','.env');\" && prisma generate",
     "start": "node dist/main",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev --name init"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
+    "dotenv": "^16.4.5",
     "@nestjs/common": "^10.3.0",
     "@nestjs/core": "^10.3.0",
     "@nestjs/platform-express": "^10.3.0",
