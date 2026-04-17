@@ -40,4 +40,13 @@ export class AgentsController {
       body.mediaId,
     );
   }
+
+  @Post('carousel')
+  generateCarousel(@Body() body: { script?: string; brandName?: string; niche?: string }) {
+    return this.agentsService.generateCarousel(
+      body.script ?? '',
+      body.brandName ?? 'ActiveWear IL',
+      body.niche ?? 'ספורטוויר נשים',
+    );
+  }
 }

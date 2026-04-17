@@ -188,6 +188,55 @@ export class AgentsService {
 ☐ שמרי לגלריה ✓`;
   }
 
+  async generateCarousel(
+    script: string,
+    brandName: string,
+    niche: string,
+  ): Promise<{ slides: Array<{ type: string; title: string; body: string; emoji: string }> }> {
+    const prompt = `בהתבסס על הסקריפט הבא, צרי תוכן ל-6 שקופיות קרוסל אינסטגרם לברנד "${brandName}".
+נישה: ${niche}
+סקריפט: ${script}
+
+החזירי JSON בלבד (ללא markdown) במבנה:
+{"slides":[
+  {"type":"hook","title":"כותרת מושכת","body":"תת-כותרת/שאלה","emoji":"🔥"},
+  {"type":"problem","title":"הבעיה","body":"תיאור הכאב ב-2 משפטים","emoji":"😤"},
+  {"type":"solution","title":"הפתרון","body":"תועלת ספציפית","emoji":"✨"},
+  {"type":"solution","title":"יתרון נוסף","body":"תועלת נוספת","emoji":"💪"},
+  {"type":"proof","title":"תוצאות","body":"מספרים/עדות","emoji":"🏆"},
+  {"type":"cta","title":"מה עכשיו","body":"קריאה לפעולה אחת","emoji":"👇"}
+]}
+עברית בלבד. כותרת: עד 6 מילים. גוף: עד 20 מילים.`;
+
+    try {
+      const stream = this.client.messages.stream({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 800,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: 'user', content: prompt }],
+      });
+      const message = await (await stream).finalMessage();
+      if (message.content[0]?.type === 'text') {
+        const raw = message.content[0].text.replace(/```json|```/g, '').trim();
+        const parsed = JSON.parse(raw);
+        if (parsed.slides?.length) return parsed;
+      }
+    } catch {}
+
+    return { slides: this.demoCarousel(brandName) };
+  }
+
+  private demoCarousel(brandName: string) {
+    return [
+      { type: 'hook',     emoji: '🔥', title: '90% מהנשים עושות את הטעות הזו',   body: 'בחירת לגינס לא נכונה הורסת כל אימון' },
+      { type: 'problem',  emoji: '😤', title: 'הלגינס שלך בוגד בך',              body: 'שקוף, נופל, לא שומר מקום — מכירה את זה?' },
+      { type: 'solution', emoji: '✨', title: 'בד שלא בוגד',                     body: 'טכנולוגיית 4-way stretch שנשארת במקום בכל תנועה' },
+      { type: 'solution', emoji: '💪', title: 'מותן גבוה שמחזיק הכל',            body: 'פס מותן רחב 10 ס"מ — בטן שטוחה בכל זווית' },
+      { type: 'proof',    emoji: '🏆', title: '+2,400 נשים כבר בחרו',            body: '4.9 כוכבים · משלוח חינם · החלפה ללא שאלות' },
+      { type: 'cta',      emoji: '👇', title: 'הגיע הזמן לשדרג',                 body: `קישור בביו של ${brandName} · משלוח עד 3 ימים` },
+    ];
+  }
+
   private demoHashtags(): string[] {
     return [
       '#ספורטוויר', '#לגינס_נשים', '#כושר_נשים', '#אורח_חיים_בריא',

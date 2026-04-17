@@ -2,11 +2,13 @@ import { Outlet, NavLink } from 'react-router-dom'
 import { useStore } from '../store'
 
 const nav = [
-  { to: '/library',   label: 'ספרייה',   icon: '🖼️',  desc: 'מדיה' },
-  { to: '/studio',    label: 'סטודיו',   icon: '🎬',  desc: 'סקריפט' },
-  { to: '/capcut',    label: 'CapCut',   icon: '✂️',  desc: 'עריכה' },
-  { to: '/publisher', label: 'פרסום',    icon: '📤',  desc: 'תזמון' },
-  { to: '/analytics', label: 'אנליטיקס', icon: '📊',  desc: 'נתונים' },
+  { to: '/library',   label: 'ספרייה',   icon: '🖼️' },
+  { to: '/studio',    label: 'סטודיו',   icon: '🎬' },
+  { to: '/capcut',    label: 'CapCut',   icon: '✂️' },
+  { to: '/carousel',  label: 'קרוסל',    icon: '🎠' },
+  { to: '/video',     label: 'וידאו',    icon: '🎥' },
+  { to: '/publisher', label: 'פרסום',    icon: '📤' },
+  { to: '/analytics', label: 'אנליטיקס', icon: '📊' },
 ]
 
 export default function Layout() {
@@ -61,7 +63,7 @@ export default function Layout() {
       </main>
 
       <footer className="border-t border-gray-800 py-3 text-center text-xs text-gray-600">
-        ActiveWear IL Dashboard · Pipeline: ספרייה → סטודיו → CapCut → פרסום
+        ActiveWear IL Dashboard · ספרייה → סטודיו → CapCut / קרוסל / וידאו → פרסום
       </footer>
     </div>
   )

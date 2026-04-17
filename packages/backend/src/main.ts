@@ -17,6 +17,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api', { exclude: ['/'] });
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
   app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/api/uploads' });
+  app.useStaticAssets(join(__dirname, '..', 'uploads', 'processed'), { prefix: '/api/processed' });
 
   // Serve the built React frontend so everything runs on one port
   // __dirname = packages/backend/dist → go up 2 levels to packages/, then frontend/dist

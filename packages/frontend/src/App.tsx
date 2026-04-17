@@ -4,6 +4,8 @@ import Layout from './components/Layout'
 import Library from './pages/Library'
 import Studio from './pages/Studio'
 import CapCut from './pages/CapCut'
+import Carousel from './pages/Carousel'
+import VideoEditor from './pages/VideoEditor'
 import Publisher from './pages/Publisher'
 import Analytics from './pages/Analytics'
 
@@ -24,6 +26,8 @@ export default function App() {
               <Route path="library" element={<Library />} />
               <Route path="studio" element={<Studio />} />
               <Route path="capcut" element={<CapCut />} />
+              <Route path="carousel" element={<Carousel />} />
+              <Route path="video" element={<VideoEditor />} />
               <Route path="publisher" element={<Publisher />} />
               <Route path="analytics" element={<Analytics />} />
             </Route>
