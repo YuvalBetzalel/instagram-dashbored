@@ -17,16 +17,24 @@ export default function Studio() {
   const [status, setStatus] = useState<string | null>(null)
 
   const scriptMutation = useMutation({
-    mutationFn: () =>
-      apiPost<{ result: string }>('/agents/script', {
+    mutationFn: async () => {
+      const generated = await apiPost<{ result: string }>('/agents/script', {
         mediaIds: selectedMedia.map((m) => m.id),
         contentType,
         niche,
-      }),
+      })
+      const saved = await apiPost<{ id: string }>('/agents/save-script', {
+        content: generated.result,
+        contentType,
+        niche,
+        mediaId: selectedMedia[0]?.id,
+      })
+      return { result: generated.result, id: saved.id }
+    },
     onMutate: () => { setGenerating(true); setStatus('מייצרת סקריפט...') },
     onSuccess: (data) => {
       setEditedScript(data.result)
-      setCurrentScript({ content: data.result, contentType, niche })
+      setCurrentScript({ id: data.id, content: data.result, contentType, niche })
       setStatus(null)
     },
     onError: () => setStatus('שגיאה — נסי שוב'),
@@ -86,7 +94,7 @@ export default function Studio() {
             ) : (
               <div className="grid grid-cols-2 gap-2">
                 {selectedMedia.map((m) => {
-                  const src = `/api/uploads/${m.path.split('/').pop()}`
+                  const src = `/api/uploads/${m.path}`
                   const isVid = m.mimetype.startsWith('video/')
                   return (
                     <div key={m.id} className="aspect-square rounded-lg overflow-hidden bg-gray-800 relative">

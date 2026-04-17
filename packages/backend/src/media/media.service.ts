@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { unlinkSync, existsSync } from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class MediaService {
@@ -11,7 +12,7 @@ export class MediaService {
     if (!tags) return all;
     const filterTags = tags.split(',').map((t) => t.trim().toLowerCase());
     return all.filter((m) => {
-      const mediaTags: string[] = JSON.parse(m.tags || '[]');
+      const mediaTags: string[] = (() => { try { return JSON.parse(m.tags || '[]'); } catch { return []; } })();
       return filterTags.some((t) => mediaTags.map((mt) => mt.toLowerCase()).includes(t));
     });
   }
@@ -29,7 +30,7 @@ export class MediaService {
         filename: file.originalname,
         mimetype: file.mimetype,
         size: file.size,
-        path: file.path,
+        path: file.filename,
         tags: JSON.stringify(tagArray),
       },
     });
@@ -46,8 +47,9 @@ export class MediaService {
   async delete(id: string) {
     const media = await this.prisma.media.findUnique({ where: { id } });
     if (!media) throw new NotFoundException('Media not found');
-    if (existsSync(media.path)) {
-      try { unlinkSync(media.path); } catch {}
+    const fullPath = join('uploads', media.path);
+    if (existsSync(fullPath)) {
+      try { unlinkSync(fullPath); } catch {}
     }
     return this.prisma.media.delete({ where: { id } });
   }

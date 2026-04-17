@@ -18,7 +18,7 @@ function MediaCard({ item, selected, onToggle, onDelete }: {
 }) {
   const tags: string[] = (() => { try { return JSON.parse(item.tags) } catch { return [] } })()
   const isVideo = item.mimetype.startsWith('video/')
-  const src = `/api/uploads/${item.path.split('/').pop()}`
+  const src = `/api/uploads/${item.path}`
 
   return (
     <div
