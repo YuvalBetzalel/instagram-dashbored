@@ -1,6 +1,7 @@
 import 'reflect-metadata';
 import { config } from 'dotenv';
 import { resolve } from 'path';
+import { mkdirSync } from 'fs';
 config({ path: resolve(__dirname, '../.env') });
 
 import { NestFactory } from '@nestjs/core';
@@ -16,8 +17,12 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api', { exclude: ['/'] });
   app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
-  app.useStaticAssets(join(__dirname, '..', 'uploads'), { prefix: '/api/uploads' });
-  app.useStaticAssets(join(__dirname, '..', 'uploads', 'processed'), { prefix: '/api/processed' });
+  const uploadsDir = join(__dirname, '..', 'uploads');
+  const processedDir = join(uploadsDir, 'processed');
+  mkdirSync(uploadsDir, { recursive: true });
+  mkdirSync(processedDir, { recursive: true });
+  app.useStaticAssets(uploadsDir, { prefix: '/api/uploads' });
+  app.useStaticAssets(processedDir, { prefix: '/api/processed' });
 
   // Serve the built React frontend so everything runs on one port
   // __dirname = packages/backend/dist → go up 2 levels to packages/, then frontend/dist
