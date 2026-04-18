@@ -2,10 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { unlinkSync, existsSync, mkdirSync } from 'fs';
 import { join } from 'path';
-import ffmpeg from 'fluent-ffmpeg';
-import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
-
-ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
 @Injectable()
 export class MediaService {
@@ -62,6 +58,12 @@ export class MediaService {
     mkdirSync(processedDir, { recursive: true });
     const outFilename = `processed-${Date.now()}-${media.path}`;
     const outputPath = join(processedDir, outFilename);
+
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const ffmpeg = require('fluent-ffmpeg');
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const ffmpegInstaller = require('@ffmpeg-installer/ffmpeg');
+    ffmpeg.setFfmpegPath(ffmpegInstaller.path);
 
     return new Promise((resolve, reject) => {
       let cmd = ffmpeg(inputPath).outputOptions([
