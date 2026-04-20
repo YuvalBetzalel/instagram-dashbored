@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { config } from 'dotenv';
 import { resolve } from 'path';
-import { mkdirSync } from 'fs';
+import { mkdirSync, existsSync } from 'fs';
 config({ path: resolve(__dirname, '../.env') });
 
 import { NestFactory } from '@nestjs/core';
@@ -24,10 +24,11 @@ async function bootstrap() {
   app.useStaticAssets(uploadsDir, { prefix: '/api/uploads' });
   app.useStaticAssets(processedDir, { prefix: '/api/processed' });
 
-  // Serve the built React frontend so everything runs on one port
-  // __dirname = packages/backend/dist → go up 2 levels to packages/, then frontend/dist
+  // Serve the built React frontend (only in production where dist/ exists)
   const frontendDist = join(__dirname, '..', '..', 'frontend', 'dist');
-  app.useStaticAssets(frontendDist, { prefix: '/' });
+  if (existsSync(frontendDist)) {
+    app.useStaticAssets(frontendDist, { prefix: '/' });
+  }
 
   const port = process.env.PORT || 3000;
   await app.listen(port, '0.0.0.0');
