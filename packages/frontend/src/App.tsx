@@ -1,19 +1,29 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import Layout from './components/Layout'
-import Library from './pages/Library'
-import Studio from './pages/Studio'
-import CapCut from './pages/CapCut'
-import Carousel from './pages/Carousel'
-import VideoEditor from './pages/VideoEditor'
-import Publisher from './pages/Publisher'
-import Analytics from './pages/Analytics'
+
+const Library    = lazy(() => import('./pages/Library'))
+const Studio     = lazy(() => import('./pages/Studio'))
+const CapCut     = lazy(() => import('./pages/CapCut'))
+const Carousel   = lazy(() => import('./pages/Carousel'))
+const VideoEditor = lazy(() => import('./pages/VideoEditor'))
+const Publisher  = lazy(() => import('./pages/Publisher'))
+const Analytics  = lazy(() => import('./pages/Analytics'))
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: { retry: 1, staleTime: 30_000 },
   },
 })
+
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[40vh] text-gray-500 text-sm gap-2">
+      <span className="animate-spin">⏳</span> טוענת...
+    </div>
+  )
+}
 
 export default function App() {
   return (
@@ -23,13 +33,13 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Navigate to="/library" replace />} />
-              <Route path="library" element={<Library />} />
-              <Route path="studio" element={<Studio />} />
-              <Route path="capcut" element={<CapCut />} />
-              <Route path="carousel" element={<Carousel />} />
-              <Route path="video" element={<VideoEditor />} />
-              <Route path="publisher" element={<Publisher />} />
-              <Route path="analytics" element={<Analytics />} />
+              <Route path="library"   element={<Suspense fallback={<PageLoader />}><Library /></Suspense>} />
+              <Route path="studio"    element={<Suspense fallback={<PageLoader />}><Studio /></Suspense>} />
+              <Route path="capcut"    element={<Suspense fallback={<PageLoader />}><CapCut /></Suspense>} />
+              <Route path="carousel"  element={<Suspense fallback={<PageLoader />}><Carousel /></Suspense>} />
+              <Route path="video"     element={<Suspense fallback={<PageLoader />}><VideoEditor /></Suspense>} />
+              <Route path="publisher" element={<Suspense fallback={<PageLoader />}><Publisher /></Suspense>} />
+              <Route path="analytics" element={<Suspense fallback={<PageLoader />}><Analytics /></Suspense>} />
             </Route>
           </Routes>
         </div>
